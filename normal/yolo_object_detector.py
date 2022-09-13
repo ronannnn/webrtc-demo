@@ -1,26 +1,27 @@
+import random
+
 import torch
 import cv2
 
 
 class YoloObjectDetector:
     """
-    Class implements Yolo5 model to make inferences on a youtube video using Opencv2.
+    Class implements Yolo5 model to make inferences on a YouTube video using Opencv2.
     """
 
     def __init__(self):
-        """
-        :param model_name: yolo model name
-        """
         self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
         self.classes = self.model.names
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        self.color_map = {}
         print("Using Device: ", self.device)
 
     def plot_boxes(self, frame):
         """
         Takes a frame and its results as input, and plots the bounding boxes and label on to the frame.
+
         :param frame: Frame which has been scored.
-        :return: Frame with bounding boxes and labels ploted on it.
+        :return: Frame with bounding boxes and labels plotted on it.
         """
 
         # Get labels and coordinates of predicted objects
@@ -34,7 +35,14 @@ class YoloObjectDetector:
             row = cord[i]
             if row[4] >= 0.3:
                 x1, y1, x2, y2 = int(row[0] * x_shape), int(row[1] * y_shape), int(row[2] * x_shape), int(row[3] * y_shape)
-                bgr = (0, 255, 0)
+                bgr = self.get_box_color(self.classes[int(labels[i])])
                 cv2.rectangle(frame, (x1, y1), (x2, y2), bgr, 2)
                 cv2.putText(frame, self.classes[int(labels[i])], (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 0.9, bgr, 2)
         return frame
+
+    def get_box_color(self, label):
+        if label in self.color_map:
+            return self.color_map[label]
+        else:
+            self.color_map[label] = random.choices(range(256), k=3)
+            return self.color_map[label]
