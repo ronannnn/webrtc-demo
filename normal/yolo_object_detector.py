@@ -1,4 +1,5 @@
 import random
+import time
 
 import torch
 import cv2
@@ -46,3 +47,35 @@ class YoloObjectDetector:
         else:
             self.color_map[label] = random.choices(range(256), k=3)
             return self.color_map[label]
+
+    def live_demo(self):
+        cap = cv2.VideoCapture(0)
+        if not cap.isOpened():
+            print("Cannot open camera")
+            exit()
+        prev_frame_time = time.time()
+        while True:
+            success, frame = cap.read()
+            if not success:
+                print("Can't receive frame (stream end?). Exiting ...")
+                break
+            frame = cv2.flip(frame, 1)
+
+            # get fps
+            new_frame_time = time.time()
+            fps = 1 / (new_frame_time - prev_frame_time)
+            prev_frame_time = new_frame_time
+
+            # detect lane line
+            frame = self.plot_boxes(frame)
+            frame = cv2.putText(frame, "FPS: {}".format(str(int(fps))), (50, 200), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 0, 0), 5, cv2.LINE_AA)
+            cv2.imshow('frame', frame)
+            if cv2.waitKey(1) == ord('q'):
+                break
+
+        cap.release()
+        cv2.destroyAllWindows()
+
+
+if __name__ == '__main__':
+    YoloObjectDetector().live_demo()
