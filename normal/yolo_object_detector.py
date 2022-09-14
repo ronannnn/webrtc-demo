@@ -1,4 +1,3 @@
-import os
 import random
 import time
 
@@ -12,7 +11,7 @@ class YoloObjectDetector:
     """
 
     def __init__(self, device='cuda'):
-        self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+        self.model = torch.hub.load('yolov5', 'custom', path='yolov5s.pt', source='local')
         self.classes = self.model.names
         if device == 'cuda' and torch.cuda.is_available():
             self.device = 'cuda'
