@@ -1,3 +1,4 @@
+import os
 import random
 import time
 
@@ -10,10 +11,13 @@ class YoloObjectDetector:
     Class implements Yolo5 model to make inferences on a YouTube video using Opencv2.
     """
 
-    def __init__(self):
+    def __init__(self, device='cuda'):
         self.model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
         self.classes = self.model.names
-        self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
+        if device == 'cuda' and torch.cuda.is_available():
+            self.device = 'cuda'
+        else:
+            self.device = 'cpu'
         self.color_map = {}
         print("Using Device: ", self.device)
 
