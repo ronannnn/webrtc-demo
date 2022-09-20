@@ -11,6 +11,7 @@ class YoloObjectDetector:
     """
 
     def __init__(self, device='cuda'):
+        # https://docs.ultralytics.com/tutorials/pytorch-hub/
         self.model = torch.hub.load('yolov5', 'custom', path='yolov5s.pt', source='local')
         self.classes = self.model.names
         if device == 'cuda' and torch.cuda.is_available():
