@@ -3,7 +3,6 @@ import asyncio
 import json
 import logging
 import os
-import platform
 import ssl
 import time
 
@@ -22,6 +21,12 @@ ROOT = os.path.dirname(__file__)
 
 relay = None
 webcam = None
+
+rtsp_server_ip = os.getenv("RTSP_SERVER_IP")
+rtsp_server_ip = rtsp_server_ip if rtsp_server_ip is not None else "10.70.185.63"
+rtsp_server_port = os.getenv("RTSP_SERVER_PORT")
+rtsp_server_port = rtsp_server_port if rtsp_server_port is not None else "8554"
+rtsp_addr = "rtsp://{}:{}/cam".format(rtsp_server_ip, rtsp_server_port)
 
 
 class VideoTransformTrack(MediaStreamTrack):
@@ -100,16 +105,7 @@ def create_local_tracks(play_from, decode):
     else:
         options = {"framerate": "30", "video_size": "640x480"}
         if relay is None:
-            if platform.system() == "Darwin":
-                webcam = MediaPlayer(
-                    "default:none", format="avfoundation", options=options
-                )
-            elif platform.system() == "Windows":
-                webcam = MediaPlayer(
-                    "video=Integrated Camera", format="dshow", options=options
-                )
-            else:
-                webcam = MediaPlayer("/dev/video0", format="v4l2", options=options)
+            webcam = MediaPlayer(rtsp_addr, format="rtsp", options=options)
             relay = MediaRelay()
         return None, relay.subscribe(webcam.video)
 
