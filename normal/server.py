@@ -22,24 +22,28 @@ ROOT = os.path.dirname(__file__)
 relay = None
 webcam = None
 
+# ENV VARIABLES
+# rtsp-related
 rtsp_server_ip = os.getenv("RTSP_SERVER_IP")
 rtsp_server_ip = rtsp_server_ip if rtsp_server_ip is not None else "10.70.185.63"
 rtsp_server_port = os.getenv("RTSP_SERVER_PORT")
 rtsp_server_port = rtsp_server_port if rtsp_server_port is not None else "8554"
 rtsp_addr = "rtsp://{}:{}/cam".format(rtsp_server_ip, rtsp_server_port)
+# yolo-related
+enable_yolo = os.getenv("ENABLE_YOLO")
+enable_yolo = enable_yolo if enable_yolo is not None else False
 
 
 class VideoTransformTrack(MediaStreamTrack):
     """
-    A video stream track that transforms frames from an another track.
+    A video stream track that transforms frames from another track.
     """
 
     kind = "video"
 
-    def __init__(self, track, transform, enable_object_detection):
+    def __init__(self, track, enable_object_detection):
         super().__init__()  # don't forget this!
         self.track = track
-        self.transform = transform
         self.prev_frame_time = time.time()
         self.enable_object_detection = enable_object_detection
         if enable_object_detection:
@@ -49,35 +53,6 @@ class VideoTransformTrack(MediaStreamTrack):
         frame = await self.track.recv()
 
         img = frame.to_ndarray(format="bgr24")
-        if self.transform == "cartoon":
-            # prepare color
-            img_color = cv2.pyrDown(cv2.pyrDown(img))
-            for _ in range(6):
-                img_color = cv2.bilateralFilter(img_color, 9, 9, 7)
-            img_color = cv2.pyrUp(cv2.pyrUp(img_color))
-
-            # prepare edges
-            img_edges = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
-            img_edges = cv2.adaptiveThreshold(
-                cv2.medianBlur(img_edges, 7),
-                255,
-                cv2.ADAPTIVE_THRESH_MEAN_C,
-                cv2.THRESH_BINARY,
-                9,
-                2,
-            )
-            img_edges = cv2.cvtColor(img_edges, cv2.COLOR_GRAY2RGB)
-
-            # combine color and edges
-            img = cv2.bitwise_and(img_color, img_edges)
-        elif self.transform == "edges":
-            # perform edge detection
-            img = cv2.cvtColor(cv2.Canny(img, 100, 200), cv2.COLOR_GRAY2BGR)
-        elif self.transform == "rotate":
-            # rotate image
-            rows, cols, _ = img.shape
-            M = cv2.getRotationMatrix2D((cols / 2, rows / 2), frame.time * 45, 1)
-            img = cv2.warpAffine(img, M, (cols, rows))
 
         # draw fps
         new_frame_time = time.time()
@@ -96,11 +71,11 @@ class VideoTransformTrack(MediaStreamTrack):
         return new_frame
 
 
-def create_local_tracks(play_from, decode):
+def create_local_tracks(play_from):
     global relay, webcam
 
     if play_from:
-        player = MediaPlayer(play_from, decode=decode)
+        player = MediaPlayer(play_from)
         return player.audio, player.video
     else:
         options = {"framerate": "30", "video_size": "640x480"}
@@ -144,10 +119,7 @@ async def offer(request):
             pcs.discard(pc)
 
     # open media source
-    audio, video = create_local_tracks(
-        args.play_from, decode=not args.play_without_decoding
-    )
-
+    audio, video = create_local_tracks(args.play_from)
     if audio:
         audio_sender = pc.addTrack(audio)
         if args.audio_codec:
@@ -156,7 +128,7 @@ async def offer(request):
             raise Exception("You must specify the audio codec using --audio-codec")
 
     if video:
-        video_sender = pc.addTrack(VideoTransformTrack(video, transform="", enable_object_detection=True))
+        video_sender = pc.addTrack(VideoTransformTrack(video, enable_object_detection=enable_yolo))
         if args.video_codec:
             force_codec(pc, video_sender, args.video_codec)
         elif args.play_without_decoding:
