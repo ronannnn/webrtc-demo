@@ -31,7 +31,8 @@ rtsp_server_port = rtsp_server_port if rtsp_server_port is not None else "8554"
 rtsp_addr = "rtsp://{}:{}/cam".format(rtsp_server_ip, rtsp_server_port)
 # yolo-related
 enable_yolo = os.getenv("ENABLE_YOLO")
-enable_yolo = enable_yolo if enable_yolo is not None else False
+enable_yolo = enable_yolo.lower() if enable_yolo is not None else 'false'
+enable_yolo = True if enable_yolo == 'true' else False
 
 
 class VideoTransformTrack(MediaStreamTrack):
