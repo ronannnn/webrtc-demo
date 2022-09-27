@@ -13,6 +13,6 @@ RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 RUN pip3 install aiohttp aiortc opencv-python
 RUN pip3 install PyYAML tqdm matplotlib
 RUN pip3 install pandas requests pillow
-RUN pip3 install seaborn
+RUN pip3 install seaborn psutil
 COPY . .
 CMD [ "python3", "server.py"]
