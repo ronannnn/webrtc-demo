@@ -6,7 +6,7 @@ RUN apt-get install -y gcc
 RUN apt-get install -y ffmpeg
 RUN apt-get install -y libsm6
 RUN apt-get install -y libxext6
-RUN pip3 install torch--extra-index-url https://download.pytorch.org/whl/cu116
+RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cu116
 RUN pip3 install torchvision --extra-index-url https://download.pytorch.org/whl/cu116
 RUN pip3 install torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
 RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
