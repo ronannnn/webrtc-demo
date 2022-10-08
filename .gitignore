@@ -2,3 +2,4 @@
 .vscode
 *.tar
 yolov5
+__pycache__
