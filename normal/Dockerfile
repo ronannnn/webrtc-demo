@@ -6,13 +6,11 @@ RUN apt-get install -y gcc
 RUN apt-get install -y ffmpeg
 RUN apt-get install -y libsm6
 RUN apt-get install -y libxext6
-RUN pip3 install torch --extra-index-url https://download.pytorch.org/whl/cu116
-RUN pip3 install torchvision --extra-index-url https://download.pytorch.org/whl/cu116
-RUN pip3 install torchaudio --extra-index-url https://download.pytorch.org/whl/cu116
-RUN pip3 config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
-RUN pip3 install aiohttp aiortc opencv-python
-RUN pip3 install PyYAML tqdm matplotlib
-RUN pip3 install pandas requests pillow
-RUN pip3 install seaborn psutil
+RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple aiohttp aiortc opencv-python
+RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple PyYAML tqdm matplotlib
+RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple pandas requests pillow
+RUN pip3 install -i https://pypi.tuna.tsinghua.edu.cn/simple seaborn psutil
+RUN apt-get install -y libatlas-base-dev python3-scipy
+RUN pip3 install torch torchvision torchaudio
 COPY . .
 CMD [ "python3", "server.py"]
