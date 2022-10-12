@@ -3,3 +3,4 @@
 *.tar
 yolov5
 __pycache__
+*.whl
