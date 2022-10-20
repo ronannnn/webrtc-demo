@@ -24,12 +24,14 @@ RUN apt-get install -y libpython3.9-dev
 RUN pip3 install aiohttp aiortc opencv-python
 RUN pip3 install PyYAML tqdm matplotlib
 RUN pip3 install pandas requests pillow
-RUN pip3 install seaborn psutil
+RUN pip3 install seaborn psutil ipython
 
 # install customized python lib
 WORKDIR /app
 COPY torch-1.14.0a0+gitb5bdc34-cp39-cp39-linux_aarch64.whl ./
 RUN pip3 install torch-1.14.0a0+gitb5bdc34-cp39-cp39-linux_aarch64.whl
+COPY torchvision-0.15.0a0+7a62a54-cp39-cp39-linux_aarch64.whl ./
+RUN pip3 install torchvision-0.15.0a0+7a62a54-cp39-cp39-linux_aarch64.whl
 
 RUN apt-get install libcudnn8=8.5.0.96-1+cuda11.7
 RUN apt-get install libcudnn8-dev=8.5.0.96-1+cuda11.7
