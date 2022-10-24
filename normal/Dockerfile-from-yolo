@@ -1,5 +1,0 @@
-FROM ronannnn/yolo-demo:0.3.0
-
-WORKDIR /app-with-rtsp-server
-COPY . .
-CMD [ "python3", "server.py"]

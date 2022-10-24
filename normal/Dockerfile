@@ -25,6 +25,7 @@ RUN pip3 install aiohttp aiortc opencv-python
 RUN pip3 install PyYAML tqdm matplotlib
 RUN pip3 install pandas requests pillow
 RUN pip3 install seaborn psutil ipython
+RUN pip3 install scipy
 
 # install customized python lib
 WORKDIR /app

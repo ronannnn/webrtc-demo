@@ -1,5 +1,6 @@
 import random
 import time
+import logging as log
 
 import torch
 import cv2
@@ -20,7 +21,7 @@ class YoloObjectDetector:
         else:
             self.device = 'cpu'
         self.color_map = {}
-        print("Using Device: ", self.device)
+        log.info("Using Device: %s", self.device)
 
     def plot_boxes(self, frame):
         """
