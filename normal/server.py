@@ -27,10 +27,15 @@ rtsp_server_ip = rtsp_server_ip if rtsp_server_ip is not None else "10.70.185.63
 rtsp_server_port = os.getenv("RTSP_SERVER_PORT")
 rtsp_server_port = rtsp_server_port if rtsp_server_port is not None else "8554"
 rtsp_addr = "rtsp://{}:{}/file".format(rtsp_server_ip, rtsp_server_port)
+
 # yolo-related
 enable_yolo = os.getenv("ENABLE_YOLO")
 enable_yolo = enable_yolo.lower() if enable_yolo is not None else 'false'
 enable_yolo = True if enable_yolo == 'true' else False
+
+enable_gpu = os.getenv("ENABLE_GPU")
+enable_gpu = enable_gpu.lower() if enable_gpu is not None else 'false'
+enable_gpu = True if enable_gpu == 'true' else False
 
 
 class VideoTransformTrack(MediaStreamTrack):
@@ -40,13 +45,13 @@ class VideoTransformTrack(MediaStreamTrack):
 
     kind = "video"
 
-    def __init__(self, track, enable_object_detection):
+    def __init__(self, track, enable_object_detection, enable_gpu):
         super().__init__()  # don't forget this!
         self.track = track
         self.prev_frame_time = time.time()
         self.enable_object_detection = enable_object_detection
         if enable_object_detection:
-            self.yod = YoloObjectDetector()
+            self.yod = YoloObjectDetector(enable_gpu)
 
     async def recv(self):
         frame = await self.track.recv()
