@@ -57,11 +57,11 @@ class VideoTransformTrack(MediaStreamTrack):
         new_frame_time = time.time()
         fps = 1 / (new_frame_time - self.prev_frame_time)
         self.prev_frame_time = new_frame_time
-        img = cv2.putText(img, "FPS: {}".format(str(int(fps))), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 5, cv2.LINE_AA)
 
         # draw object box
         if self.enable_object_detection:
             img = self.yod.plot_boxes(img)
+        img = cv2.putText(img, "FPS: {}".format(str(int(fps))), (10, 60), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 5, cv2.LINE_AA)
 
         # rebuild a VideoFrame, preserving timing information
         new_frame = VideoFrame.from_ndarray(img, format="bgr24")
