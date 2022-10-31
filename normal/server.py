@@ -109,7 +109,7 @@ async def offer(request):
             pcs.discard(pc)
 
     # open media source
-    pc.addTrack(VideoTransformTrack(create_local_tracks(), enable_object_detection=enable_yolo))
+    pc.addTrack(VideoTransformTrack(create_local_tracks(), enable_object_detection=enable_yolo, enable_gpu=enable_gpu))
 
     await pc.setRemoteDescription(offer)
 
