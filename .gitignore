@@ -5,3 +5,5 @@ yolov5
 __pycache__
 *.whl
 *.mp4
+*.pt
+.DS_Store
